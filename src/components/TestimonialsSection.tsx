@@ -9,7 +9,7 @@ const TestimonialsSection = () => {
 
   const testimonials = [
     {
-      name: 'Sarah Johnson',
+      name: 'Rahul Jain',
       role: 'Hotel Manager',
       company: 'Grand Plaza Hotel',
       content:
@@ -18,7 +18,7 @@ const TestimonialsSection = () => {
       image: '👩‍💼',
     },
     {
-      name: 'Michael Chen',
+      name: 'Nirmit Garg',
       role: 'Restaurant Owner',
       company: 'Urban Bistro',
       content:
@@ -27,7 +27,7 @@ const TestimonialsSection = () => {
       image: '👨‍🍳',
     },
     {
-      name: 'Emma Rodriguez',
+      name: 'Mohit Yadav',
       role: 'Job Seeker',
       company: 'Hospitality Professional',
       content:
