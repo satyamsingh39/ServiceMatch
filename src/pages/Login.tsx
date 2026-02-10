@@ -543,45 +543,37 @@ const Login = () => {
       // 4️⃣ Save token locally
       localStorage.setItem("token", token);
 
-      // 5️⃣ Retrieve user metadata from signup (if exists)
-      const savedProfile = localStorage.getItem("pendingProfile");
-      const profileData = savedProfile ? JSON.parse(savedProfile) : null;
+      // 5️⃣ Fetch User Role from Backend
+      const backendUrl = "http://localhost:5000/api/auth/me";
+      const res = await axios.get(backendUrl, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-      // 6️⃣ Send user data to backend (create/update profile)
-      if (profileData) {
-        const res = await axios.post(
-          "http://localhost:5000/api/users/create-profile",
-          {
-            firstName: profileData.firstName,
-            lastName: profileData.lastName,
-            role: profileData.role,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        console.log("✅ Profile synced to backend:", res.data);
-        localStorage.removeItem("pendingProfile"); // clean up
-      } else {
-        // if user already has a profile
-        console.log("ℹ️ No pending profile; likely returning user");
-      }
+      const user = res.data.data;
+      const role = user.role;
 
       toast({
         title: "Login successful 🎉",
-        description: "Welcome back to ServiceMatch!",
+        description: `Welcome back, ${user.firstName}!`,
       });
 
-      // 7️⃣ Redirect to role-based dashboard
-      navigate("/"); // You can replace with `/dashboard` or role-based page
+      // 6️⃣ Redirect based on role
+      if (role === "chef-waiter") {
+        navigate("/waiter/dashboard");
+      } else if (role === "hotel-restaurant") {
+        navigate("/hotel/dashboard");
+      } else {
+        // Fallback
+        navigate("/");
+      }
+
     } catch (error: any) {
       console.error("🔥 Login error:", error);
       toast({
         title: "Login failed",
-        description: error?.response?.data?.message || error.message,
+        description: error?.response?.data?.message || "Invalid credentials or server error.",
         variant: "destructive",
       });
     }

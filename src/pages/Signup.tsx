@@ -442,62 +442,80 @@ const Signup = () => {
   const passwordsMatch =
     password && confirmPassword && password === confirmPassword;
 
-// const onSubmit = async (data: SignupFormData) => {
-//   try {
-//     const { firstName, lastName, email, password, role } = data;
+  // const onSubmit = async (data: SignupFormData) => {
+  //   try {
+  //     const { firstName, lastName, email, password, role } = data;
 
-//     // 1) create firebase user
-//     const cred = await createUserWithEmailAndPassword(auth, email, password);
+  //     // 1) create firebase user
+  //     const cred = await createUserWithEmailAndPassword(auth, email, password);
 
-//     // 2) send email verification
-//     await sendEmailVerification(cred.user);
+  //     // 2) send email verification
+  //     await sendEmailVerification(cred.user);
 
-//     toast({
-//       title: "Verify your email",
-//       description: "We sent you a verification link. Please check your inbox."
-//     });
+  //     toast({
+  //       title: "Verify your email",
+  //       description: "We sent you a verification link. Please check your inbox."
+  //     });
 
-//     // store user meta for later (on login we will push this to backend)
-//     localStorage.setItem("pendingProfile", JSON.stringify({ firstName, lastName, role }));
+  //     // store user meta for later (on login we will push this to backend)
+  //     localStorage.setItem("pendingProfile", JSON.stringify({ firstName, lastName, role }));
 
-//     navigate("/login");
-//   } catch (error: any) {
-//     toast({
-//       title: "Signup failed",
-//       description: error.message,
-//       variant: "destructive"
-//     });
-//   }
-// };
+  //     navigate("/login");
+  //   } catch (error: any) {
+  //     toast({
+  //       title: "Signup failed",
+  //       description: error.message,
+  //       variant: "destructive"
+  //     });
+  //   }
+  // };
 
-const onSubmit = async (data: SignupFormData) => {
-  try {
-    const { firstName, lastName, email, password, role } = data;
+  const onSubmit = async (data: SignupFormData) => {
+    try {
+      const { firstName, lastName, email, password, role } = data;
 
-    console.log("📩 Trying to create firebase user:", email);
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
+      console.log("📩 Trying to create firebase user:", email);
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      console.log("✅ Firebase signup success:", cred.user.uid);
 
-    console.log("✅ Firebase signup success:", cred.user.uid);
+      // 1. Send verification email
+      await sendEmailVerification(cred.user);
 
-    await sendEmailVerification(cred.user);
+      // 2. Sync with Backend immediately
+      const token = await cred.user.getIdToken();
 
-    toast({
-      title: "Verify your email",
-      description: "We sent you a verification link. Please check your inbox."
-    });
+      const backendUrl = "http://localhost:5000/api/auth/sync"; // Ensure this matches your server port
+      await axios.post(
+        backendUrl,
+        {
+          name: `${firstName} ${lastName}`,
+          role: role,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-    localStorage.setItem("pendingProfile", JSON.stringify({ firstName, lastName, role }));
+      toast({
+        title: "Account created! 📧",
+        description: "Please check your email to verify your account before logging in.",
+      });
 
-    navigate("/login");
-  } catch (error: any) {
-    console.log("🔥 FIREBASE SIGNUP ERROR:", error);
-    toast({
-      title: "Signup failed",
-      description: error.message,
-      variant: "destructive"
-    });
-  }
-};
+      // No need to store pendingProfile anymore
+      localStorage.removeItem("pendingProfile");
+
+      navigate("/login");
+    } catch (error: any) {
+      console.error("🔥 SIGNUP ERROR:", error);
+      toast({
+        title: "Signup failed",
+        description: error.response?.data?.message || error.message,
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen flex">
