@@ -1,11 +1,18 @@
 import React, { useState } from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Building2, PlusCircle, Briefcase, Users, Bell, LogOut, Menu, X, Hotel } from 'lucide-react';
 import { MOCK_USER } from '../../services/mockData';
 
 const HotelLayout = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/");
+  };
 
   const navItems = [
     { path: '/hotel', label: 'Dashboard', icon: LayoutDashboard, exact: true },
@@ -86,7 +93,10 @@ const HotelLayout = () => {
               <p className="text-xs text-slate-500 truncate">SaaS Business</p>
             </div>
           </div>
-          <button className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 hover:bg-rose-50 rounded-xl transition-colors font-medium">
+          <button 
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 hover:bg-rose-50 rounded-xl transition-colors font-medium"
+          >
             <LogOut size={20} />
             Logout
           </button>

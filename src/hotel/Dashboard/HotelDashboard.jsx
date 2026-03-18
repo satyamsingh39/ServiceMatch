@@ -117,3 +117,4 @@ const HotelDashboard = () => {
 };
 
 export default HotelDashboard;
+

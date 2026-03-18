@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, User, Briefcase, FileCheck, Bell, LogOut, Menu, X, ChefHat } from 'lucide-react';
 import { MOCK_USER } from '../services/mockData';
 // import GeminiCoach from './GeminiCoach';
@@ -7,6 +7,13 @@ import { MOCK_USER } from '../services/mockData';
 const Layout: React.FC = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/");
+  };
 
   const navItems = [
     { path: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -77,7 +84,10 @@ const Layout: React.FC = () => {
               <p className="text-xs text-slate-500 truncate">{MOCK_USER.role}</p>
             </div>
           </div>
-          <button className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 hover:bg-rose-50 rounded-xl transition-colors font-medium">
+          <button 
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 hover:bg-rose-50 rounded-xl transition-colors font-medium"
+          >
             <LogOut size={20} />
             Logout
           </button>
