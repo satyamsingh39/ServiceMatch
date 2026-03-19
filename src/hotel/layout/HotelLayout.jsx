@@ -86,11 +86,11 @@ const HotelLayout = () => {
           <div className="flex items-center gap-3 px-4 py-3 mb-2 rounded-xl bg-gradient-to-br from-slate-50 to-sky-50 border border-sky-100">
             {/* Mock User for Hotel - reusing existing mock for now, or use a generic business avatar */}
             <div className="w-10 h-10 rounded-full border-2 border-white shadow-sm bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
-               H
+               T
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold truncate text-slate-800">Grand Hotel</p>
-              <p className="text-xs text-slate-500 truncate">SaaS Business</p>
+              <p className="text-sm font-bold truncate text-slate-800">The Taj Mahal Palace</p>
+              <p className="text-xs text-slate-500 truncate">Hospitality Business</p>
             </div>
           </div>
           <button 
@@ -115,10 +115,14 @@ const HotelLayout = () => {
           </div>
           
           <div className="flex items-center gap-4">
-            <button className="relative p-2 text-slate-500 hover:bg-white hover:shadow-sm rounded-full transition-all">
+            <button 
+              onClick={() => navigate('/hotel/notifications')}
+              className="relative p-2 text-slate-500 hover:bg-white hover:shadow-sm rounded-full transition-all"
+            >
               <Bell size={20} />
               <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white"></span>
             </button>
+            
              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium">
                 <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
                 Active Hiring

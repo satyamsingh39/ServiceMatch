@@ -85,7 +85,7 @@ const HotelProfile = () => {
                                 <Label htmlFor="businessName">Business Name</Label>
                                 <div className="relative">
                                     <Building2 className="absolute left-3 top-3 text-slate-400" size={18} />
-                                    <Input id="businessName" placeholder="e.g. Grand Hotel & Spa" className="pl-10" defaultValue="Grand Hotel" />
+                                    <Input id="businessName" placeholder="e.g. Taj Mahal Palace & Spa" className="pl-10" defaultValue="The Taj Mahal Palace" />
                                 </div>
                             </div>
 
@@ -110,7 +110,7 @@ const HotelProfile = () => {
                                 <Label htmlFor="website">Website (Optional)</Label>
                                 <div className="relative">
                                     <Globe className="absolute left-3 top-3 text-slate-400" size={18} />
-                                    <Input id="website" placeholder="https://www.grandhotel.com" className="pl-10" />
+                                    <Input id="website" placeholder="https://www.tajhotels.com" className="pl-10" />
                                 </div>
                             </div>
 

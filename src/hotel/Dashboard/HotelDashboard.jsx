@@ -17,7 +17,7 @@ const HotelDashboard = () => {
             {/* Welcome Section */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-800 tracking-tight">Welcome, Grand Hotel! 👋</h1>
+                    <h1 className="text-3xl font-bold text-slate-800 tracking-tight">Welcome, The Taj Mahal Palace! 👋</h1>
                     <p className="text-slate-500 mt-1 font-medium">Manage your hiring pipeline and post new jobs.</p>
                 </div>
                 <Link to="/hotel/post-job" className="bg-gradient-to-r from-primary to-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg shadow-blue-500/20 transition-all flex items-center gap-2 transform hover:-translate-y-0.5">

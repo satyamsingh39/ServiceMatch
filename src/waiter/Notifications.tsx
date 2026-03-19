@@ -5,10 +5,15 @@ import { Bell, CheckCircle, Info, AlertTriangle } from 'lucide-react';
 
 const Notifications: React.FC = () => {
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-slate-800">Notifications</h1>
-        <button className="text-sm text-primary font-bold hover:text-blue-600 hover:underline">Mark all as read</button>
+    <div className="max-w-4xl mx-auto space-y-8">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-800 tracking-tight">Notifications</h1>
+          <p className="text-slate-500 mt-1 font-medium">Keep track of your application status and updates.</p>
+        </div>
+        <button className="bg-white hover:bg-slate-50 text-slate-600 px-4 py-2 rounded-xl text-sm font-bold shadow-sm border border-slate-100 transition-all flex items-center gap-2">
+          Mark all as read
+        </button>
       </div>
 
       <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft border border-white/60 overflow-hidden divide-y divide-slate-50">

@@ -16,7 +16,7 @@ const Layout: React.FC = () => {
   };
 
   const navItems = [
-    { path: '/', label: 'Dashboard', icon: LayoutDashboard },
+    { path: '/waiter', label: 'Dashboard', icon: LayoutDashboard, exact: true },
     { path: '/waiter/jobs', label: 'Find Jobs', icon: Briefcase },
     { path: '/waiter/applications', label: 'Applied Jobs', icon: FileCheck },
     { path: '/waiter/notifications', label: 'Notifications', icon: Bell },
@@ -62,6 +62,7 @@ const Layout: React.FC = () => {
             <NavLink
               key={item.path}
               to={item.path}
+              end={item.exact}
               onClick={() => setSidebarOpen(false)}
               className={({ isActive }) => `
                 flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium
@@ -106,7 +107,10 @@ const Layout: React.FC = () => {
           </div>
           
           <div className="flex items-center gap-4">
-            <button className="relative p-2 text-slate-500 hover:bg-white hover:shadow-sm rounded-full transition-all">
+            <button 
+              onClick={() => navigate('/waiter/notifications')}
+              className="relative p-2 text-slate-500 hover:bg-white hover:shadow-sm rounded-full transition-all"
+            >
               <Bell size={20} />
               <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white"></span>
             </button>
