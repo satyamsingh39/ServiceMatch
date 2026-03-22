@@ -1,12 +1,30 @@
 import React, { useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Building2, PlusCircle, Briefcase, Users, Bell, LogOut, Menu, X, Hotel } from 'lucide-react';
-import { MOCK_USER } from '../../services/mockData';
+import api from '../../lib/api';
 
 const HotelLayout = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await api.get('/users/profile');
+        if (res.data.success) {
+          setProfile(res.data.data);
+        }
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -70,10 +88,10 @@ const HotelLayout = () => {
               end={item.exact}
               onClick={() => setSidebarOpen(false)}
               className={({ isActive }) => `
-                flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium
+                flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium border
                 ${isActive 
-                  ? 'bg-sky-50 text-primary shadow-sm ring-1 ring-sky-100' 
-                  : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'}
+                  ? 'bg-sky-50 text-primary shadow-sm border-sky-200 ring-1 ring-sky-100' 
+                  : 'text-slate-500 border-transparent hover:bg-slate-50 hover:text-slate-900 hover:border-slate-100'}
               `}
             >
               <item.icon size={20} />
@@ -84,13 +102,16 @@ const HotelLayout = () => {
 
         <div className="p-4 border-t border-sky-50">
           <div className="flex items-center gap-3 px-4 py-3 mb-2 rounded-xl bg-gradient-to-br from-slate-50 to-sky-50 border border-sky-100">
-            {/* Mock User for Hotel - reusing existing mock for now, or use a generic business avatar */}
-            <div className="w-10 h-10 rounded-full border-2 border-white shadow-sm bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
-               T
+            <div className="w-10 h-10 rounded-full border-2 border-white shadow-sm bg-blue-100 flex items-center justify-center text-blue-600 font-bold uppercase">
+               {profile?.hotelDetails?.businessName?.charAt(0) || profile?.user?.name?.charAt(0) || 'H'}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold truncate text-slate-800">The Taj Mahal Palace</p>
-              <p className="text-xs text-slate-500 truncate">Hospitality Business</p>
+              <p className="text-sm font-bold truncate text-slate-800">
+                {loading ? 'Loading...' : (profile?.hotelDetails?.businessName || profile?.user?.name || 'Hotel Portal')}
+              </p>
+              <p className="text-xs text-slate-500 truncate">
+                {profile?.hotelDetails?.businessType || 'Hospitality Business'}
+              </p>
             </div>
           </div>
           <button 
@@ -117,13 +138,13 @@ const HotelLayout = () => {
           <div className="flex items-center gap-4">
             <button 
               onClick={() => navigate('/hotel/notifications')}
-              className="relative p-2 text-slate-500 hover:bg-white hover:shadow-sm rounded-full transition-all"
+              className="relative p-2 text-slate-500 hover:bg-white hover:shadow-sm rounded-full transition-all border border-slate-100"
             >
               <Bell size={20} />
               <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white"></span>
             </button>
             
-             <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium">
+             <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium border border-blue-200">
                 <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
                 Active Hiring
              </div>

@@ -1,122 +1,3 @@
-// import { Toaster } from "@/components/ui/toaster";
-// import { Toaster as Sonner } from "@/components/ui/sonner";
-// import { TooltipProvider } from "@/components/ui/tooltip";
-// import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-// import { BrowserRouter, Routes, Route } from "react-router-dom";
-
-// import Chatbot from "./components/Chatbot";
-
-// // Public pages
-// import Index from "./pages/Index";
-// import Contact from "./pages/Contact";
-// import Signup from "./pages/Signup";
-// import Login from "./pages/Login";
-// import LearnMore from "./pages/LearnMore";
-// import PrivacyPolicy from "./pages/PrivacyPolicy";
-// import CookiePolicy from "./pages/CookiePolicy";
-// import Accessibility from "./pages/Accessibility";
-// import NotFound from "./pages/NotFound";
-
-// // Waiter pages
-// import WaiterLayout from "./pages/waiter/Dashboard/WaiterDashboard.jsx";
-// import WaiterDashboard from "./pages/waiter/Dashboard/WaiterDashboard";
-
-// const queryClient = new QueryClient();
-
-// const App = () => (
-//   <QueryClientProvider client={queryClient}>
-//     <TooltipProvider>
-//       <Toaster />
-//       <Sonner />
-
-//       <BrowserRouter>
-//         <Routes>
-//           {/* ===== PUBLIC ROUTES ===== */}
-//           <Route path="/" element={<Index />} />
-//           <Route path="/contact" element={<Contact />} />
-//           <Route path="/signup" element={<Signup />} />
-//           <Route path="/login" element={<Login />} />
-//           <Route path="/learn-more" element={<LearnMore />} />
-//           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-//           <Route path="/cookie-policy" element={<CookiePolicy />} />
-//           <Route path="/accessibility" element={<Accessibility />} />
-
-//           {/* ===== WAITER ROUTES ===== */}
-//           <Route path="/waiter" element={<WaiterLayout />}>
-//             <Route path="dashboard" element={<WaiterDashboard />} />
-//             {/* next routes will go here */}
-//             {/* profile, jobs, applications, notifications */}
-//           </Route>
-
-//           {/* ===== CATCH ALL ===== */}
-//           <Route path="*" element={<NotFound />} />
-//         </Routes>
-
-//         <Chatbot />
-//       </BrowserRouter>
-//     </TooltipProvider>
-//   </QueryClientProvider>
-// );
-
-// export default App;
-
-
-// import { Toaster } from "@/components/ui/toaster";
-// import { Toaster as Sonner } from "@/components/ui/sonner";
-// import { TooltipProvider } from "@/components/ui/tooltip";
-// import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-// import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-// import Chatbot from "./components/Chatbot";
-
-// // ===== Public pages =====
-// import Index from "./pages/Index";
-// import Contact from "./pages/Contact";
-// import Signup from "./pages/Signup";
-// import Login from "./pages/Login";
-// import LearnMore from "./pages/LearnMore";
-// import PrivacyPolicy from "./pages/PrivacyPolicy";
-// import CookiePolicy from "./pages/CookiePolicy";
-// import Accessibility from "./pages/Accessibility";
-// import NotFound from "./pages/NotFound";
-
-// import Layout from './components/Layout';
-// import Dashboard from './pages/WaiterPage/Dashboard';
-// import FindJobs from './pages/WaiterPage/FindJobs';
-// import Profile from './pages/WaiterPage/Profile';
-// import AppliedJobs from './pages/WaiterPage/AppliedJobs';
-// import Notifications from './pages/WaiterPage/Notifications';
-
-// const queryClient = new QueryClient();
-
-// const App = () => (
-//   <QueryClientProvider client={queryClient}>
-//     <TooltipProvider>
-//       <Toaster />
-//       <Sonner />
-//       <BrowserRouter>
-//         <Routes>
-//           {/* ===== PUBLIC ROUTES ===== */}
-//           <Route path="/" element={<Index />} />
-//           <Route path="/contact" element={<Contact />} />
-//           <Route path="/signup" element={<Signup />} />
-//           <Route path="/login" element={<Login />} />
-//           <Route path="/learn-more" element={<LearnMore />} />
-//           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-//           <Route path="/cookie-policy" element={<CookiePolicy />} />
-//           <Route path="/accessibility" element={<Accessibility />} />
-
-
-//           {/* ===== CATCH ALL ===== */}
-//           <Route path="*" element={<NotFound />} />
-//         </Routes>
-
-//         <Chatbot />
-//       </BrowserRouter>
-//     </TooltipProvider>
-//   </QueryClientProvider>
-// );
-
-// export default App;
 
 
 //new
@@ -164,7 +45,12 @@ const App = () => (
       <Toaster />
       <Sonner />
 
-      <BrowserRouter>
+      <BrowserRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
         <Routes>
           {/* ===== PUBLIC ROUTES ===== */}
           <Route path="/" element={<Index />} />

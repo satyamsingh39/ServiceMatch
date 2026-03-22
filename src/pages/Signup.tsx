@@ -399,7 +399,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import signupIllustration from "@/assets/signup-illustration.png";
-import axios from "axios";
+import api from "@/lib/api";
 
 
 const signupSchema = z
@@ -482,21 +482,12 @@ const Signup = () => {
       await sendEmailVerification(cred.user);
 
       // 2. Sync with Backend immediately
-      const token = await cred.user.getIdToken();
-
-      const backendUrl = "http://localhost:5000/api/auth/sync"; // Ensure this matches your server port
-      await axios.post(
-        backendUrl,
-        {
-          name: `${firstName} ${lastName}`,
-          role: role,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const backendRole = role === "chef-waiter" ? "jobseeker" : "employer";
+      
+      await api.post("/auth/sync", {
+        name: `${firstName} ${lastName}`,
+        role: backendRole,
+      });
 
       toast({
         title: "Account created! 📧",

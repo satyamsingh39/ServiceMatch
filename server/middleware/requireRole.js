@@ -2,7 +2,7 @@
  * Middleware to restrict access based on user role.
  * Assumes `req.user` is already populated by `verifyFirebaseToken`.
  *
- * @param {string[]} allowedRoles - Array of allowed roles (e.g. ["chef-waiter", "hotel-restaurant"])
+ * @param {string[]} allowedRoles - Array of allowed roles (e.g. ["jobseeker", "employer"])
  */
 export const requireRole = (...allowedRoles) => {
     return (req, res, next) => {

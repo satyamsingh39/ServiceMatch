@@ -1,8 +1,36 @@
-import React from 'react';
-import { MOCK_APPLICATIONS } from '../services/mockData';
-import { Calendar, MoreHorizontal, Building2 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Calendar, MoreHorizontal, Building2, Loader2 } from 'lucide-react';
+import api from '@/lib/api';
+import { formatDistanceToNow } from 'date-fns';
 
 const AppliedJobs: React.FC = () => {
+  const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchApplications = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get('/applications/my-applications');
+      setApplications(res.data.data || []);
+    } catch (error) {
+      console.error("Error fetching applications:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchApplications();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <Loader2 className="animate-spin text-primary" size={40} />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -24,23 +52,27 @@ const AppliedJobs: React.FC = () => {
 
         {/* List Items */}
         <div className="divide-y divide-slate-50">
-          {MOCK_APPLICATIONS.map(app => (
-            <div key={app.id} className="p-5 md:grid md:grid-cols-12 md:gap-4 md:items-center hover:bg-white/60 transition-colors group">
+          {applications.length === 0 ? (
+            <div className="p-8 text-center text-slate-500">You haven't applied to any jobs yet.</div>
+          ) : applications.map((app: any) => (
+            <div key={app._id} className="p-5 md:grid md:grid-cols-12 md:gap-4 md:items-center hover:bg-white/60 transition-colors group">
 
               {/* Job & Company Mobile/Desktop */}
               <div className="col-span-4 mb-2 md:mb-0">
-                <h3 className="font-bold text-slate-800 text-lg md:text-base group-hover:text-primary transition-colors">{app.jobTitle}</h3>
-                <p className="text-sm text-slate-500 md:hidden">{app.company}</p>
+                <h3 className="font-bold text-slate-800 text-lg md:text-base group-hover:text-primary transition-colors">
+                    {app.jobId?.title || "Unknown Position"}
+                </h3>
+                <p className="text-sm text-slate-500 md:hidden">{app.jobId?.employerId?.businessName || "ServiceMatch Partner"}</p>
               </div>
 
               <div className="col-span-3 hidden md:flex items-center gap-2 text-slate-600 font-medium">
                 <Building2 size={16} className="text-slate-400" />
-                {app.company}
+                {app.jobId?.employerId?.businessName || "ServiceMatch Partner"}
               </div>
 
               <div className="col-span-2 hidden md:flex items-center gap-2 text-sm text-slate-500">
                 <Calendar size={14} />
-                {app.date}
+                {formatDistanceToNow(new Date(app.appliedAt), { addSuffix: true })}
               </div>
 
               <div className="col-span-2 flex items-center justify-between md:justify-start mt-2 md:mt-0">
@@ -54,7 +86,9 @@ const AppliedJobs: React.FC = () => {
                   {app.status === 'Interview' && <span className="w-1.5 h-1.5 bg-violet-500 rounded-full mr-2 animate-pulse"></span>}
                   {app.status}
                 </span>
-                <span className="md:hidden text-xs text-slate-400 font-medium">{app.date}</span>
+                <span className="md:hidden text-xs text-slate-400 font-medium">
+                    {formatDistanceToNow(new Date(app.appliedAt), { addSuffix: true })}
+                </span>
               </div>
 
               <div className="col-span-1 text-right mt-2 md:mt-0 hidden md:block">
@@ -70,4 +104,4 @@ const AppliedJobs: React.FC = () => {
   );
 };
 
-export default AppliedJobs;
+export default AppliedJobs;

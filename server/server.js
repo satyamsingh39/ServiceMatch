@@ -6,12 +6,9 @@ import cors from "cors";
 import connectDB from "./config/db.js";
 import chatRoute from "./routes/chat.js";
 import authRoutes from "./routes/auth.routes.js";
-import waiterRoutes from "./routes/waiter.routes.js";
-import hotelRoutes from "./routes/hotel.routes.js";
-
-// ✅ Check environment variables
-console.log("✅ ENV CHECK → PORT:", process.env.PORT || 5000);
-console.log("✅ Firebase Admin Key (if configured):", process.env.FIREBASE_PROJECT_ID || "Not loaded");
+import jobRoutes from "./routes/job.routes.js";
+import applicationRoutes from "./routes/application.routes.js";
+import userRoutes from "./routes/userRoutes.js";
 
 // ✅ Connect MongoDB
 connectDB();
@@ -29,7 +26,7 @@ app.use(
       "http://localhost:8080", // React dev or Firebase emulator
       process.env.CLIENT_URL,  // Optional: production frontend
     ].filter(Boolean), // remove undefined
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
   })
 );
@@ -37,12 +34,22 @@ app.use(
 // ✅ Routes
 app.use("/chat", chatRoute);        // Gemini Chatbot route
 app.use("/api/auth", authRoutes);
-app.use("/api/waiter", waiterRoutes);
-app.use("/api/hotel", hotelRoutes);
+app.use("/api/jobs", jobRoutes);
+app.use("/api/applications", applicationRoutes);
+app.use("/api/users", userRoutes);
 
 // ✅ Health check
 app.get("/", (req, res) => {
   res.send("🚀 ServiceMatch API is live and running successfully!");
+});
+
+// ✅ Error handling middleware
+app.use((err, req, res, next) => {
+  console.error("❌ SERVER ERROR:", err.stack);
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+  });
 });
 
 // ✅ Start the server

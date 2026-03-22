@@ -1,16 +1,60 @@
-import React, { useState } from 'react';
-import { Search, MapPin, Filter, SlidersHorizontal } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Search, MapPin, Filter, SlidersHorizontal, Loader2 } from 'lucide-react';
 import JobCard from '../components/JobCard';
-import { MOCK_JOBS } from '../services/mockData';
+import api from '@/lib/api';
+import { useToast } from '@/hooks/use-toast';
 
 const FindJobs: React.FC = () => {
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
+  const { toast } = useToast();
 
-  const filteredJobs = MOCK_JOBS.filter(job =>
-    job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    job.company.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const fetchJobs = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get('/jobs', {
+        params: {
+          search: searchTerm,
+          location: locationFilter
+        }
+      });
+      setJobs(res.data.data || []);
+    } catch (error) {
+      toast({
+        title: "Error loading jobs",
+        description: "Could not fetch jobs from server.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      fetchJobs();
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm, locationFilter]);
+
+  const handleApply = async (jobId: string) => {
+    try {
+      await api.post('/applications', { jobId });
+      toast({
+        title: "Application Sent! 🎊",
+        description: "The employer will be notified of your application.",
+      });
+    } catch (error) {
+      toast({
+        title: "Application Failed",
+        description: error.response?.data?.message || "Something went wrong.",
+        variant: "destructive"
+      });
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -27,7 +71,7 @@ const FindJobs: React.FC = () => {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
             <input
               type="text"
-              placeholder="Search job title or company..."
+              placeholder="Search job title..."
               className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-100 focus:bg-white focus:border-primary/50 focus:ring-4 focus:ring-primary/10 rounded-xl outline-none transition-all placeholder:text-slate-400 text-slate-800"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -37,24 +81,15 @@ const FindJobs: React.FC = () => {
             <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
             <input
               type="text"
-              placeholder="Location (e.g. Manhattan)"
+              placeholder="Location..."
               className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-100 focus:bg-white focus:border-primary/50 focus:ring-4 focus:ring-primary/10 rounded-xl outline-none transition-all placeholder:text-slate-400 text-slate-800"
               value={locationFilter}
               onChange={(e) => setLocationFilter(e.target.value)}
             />
           </div>
           <button className="bg-slate-900 hover:bg-black text-white px-6 py-3 rounded-xl font-medium transition-all shadow-lg shadow-slate-900/20 flex items-center justify-center gap-2">
-            <Filter size={18} /> Filters
+            <Search size={18} /> Search
           </button>
-        </div>
-
-        {/* Quick Filters */}
-        <div className="flex flex-wrap gap-2 mt-4">
-          {['Full-time', 'Part-time', 'Casual', '$20+/hr', 'Immediate Start'].map(tag => (
-            <button key={tag} className="px-3.5 py-1.5 text-xs font-semibold bg-white border border-slate-200 rounded-lg text-slate-600 hover:border-primary hover:text-primary hover:bg-sky-50 transition-all shadow-sm">
-              {tag}
-            </button>
-          ))}
         </div>
       </div>
 
@@ -79,18 +114,6 @@ const FindJobs: React.FC = () => {
                   ))}
                 </div>
               </div>
-
-              <div>
-                <label className="text-sm font-bold text-slate-700 mb-2.5 block">Experience</label>
-                <div className="space-y-2.5">
-                  {['Entry Level', '1-3 Years', '3-5 Years', 'Senior'].map(t => (
-                    <label key={t} className="flex items-center gap-2.5 text-sm text-slate-600 cursor-pointer hover:text-primary transition-colors">
-                      <input type="checkbox" className="rounded border-slate-300 text-primary focus:ring-primary w-4 h-4" />
-                      {t}
-                    </label>
-                  ))}
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -98,18 +121,30 @@ const FindJobs: React.FC = () => {
         {/* Job List */}
         <div className="lg:col-span-3 space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="font-bold text-slate-800">{filteredJobs.length} Jobs Found</h3>
-            <span className="text-sm text-slate-500">Sorted by: <span className="font-bold text-slate-900">Relevance</span></span>
+            <h3 className="font-bold text-slate-800">{jobs.length} Jobs Found</h3>
           </div>
 
-          {filteredJobs.length > 0 ? (
-            filteredJobs.map(job => (
-              <JobCard key={job.id} job={job} onApply={(id) => alert(`Applied to job ${id}!`)} />
+          {loading ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="animate-spin text-primary" size={40} />
+            </div>
+          ) : jobs.length > 0 ? (
+            jobs.map(job => (
+              <JobCard 
+                key={job._id} 
+                job={{
+                    ...job,
+                    id: job._id,
+                    company: job.employerId?.businessName || job.employerId?.name || "ServiceMatch Partner",
+                    type: job.jobType
+                }} 
+                onApply={handleApply} 
+              />
             ))
           ) : (
             <div className="text-center py-12 bg-white/50 rounded-2xl border border-dashed border-slate-300">
               <p className="text-slate-500 font-medium">No jobs found matching your criteria.</p>
-              <button onClick={() => setSearchTerm('')} className="mt-2 text-primary font-bold hover:underline">Clear filters</button>
+              <button onClick={() => setSearchTerm('')} className="mt-2 text-primary font-bold hover:underline">Clear search</button>
             </div>
           )}
         </div>
@@ -118,4 +153,4 @@ const FindJobs: React.FC = () => {
   );
 };
 
-export default FindJobs;
+export default FindJobs;
