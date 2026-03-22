@@ -1,5 +1,5 @@
 import React from 'react';
-import { Send, Sparkles, MapPin, DollarSign, Clock, Users, Briefcase } from 'lucide-react';
+import { Send, Sparkles, MapPin, IndianRupee, Clock, Users, Briefcase } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -26,7 +26,7 @@ const PostJob = () => {
                             <div className="space-y-2">
                                 <Label className="text-base font-semibold">Job Title</Label>
                                 <div className="relative">
-                                    <Briefcase className="absolute left-3 top-3 text-slate-400" size={18} />
+                                    <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                                     <Input placeholder="e.g. Senior Chef, Waiter, Housekeeping Staff" className="pl-10 h-11" />
                                 </div>
                             </div>
@@ -35,14 +35,14 @@ const PostJob = () => {
                                 <div className="space-y-2">
                                     <Label>Salary Range / Month</Label>
                                     <div className="relative">
-                                        <DollarSign className="absolute left-3 top-3 text-slate-400" size={18} />
+                                        <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                                         <Input placeholder="e.g. 15,000 - 25,000" className="pl-10" />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Openings</Label>
                                     <div className="relative">
-                                        <Users className="absolute left-3 top-3 text-slate-400" size={18} />
+                                        <Users className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                                         <Input type="number" placeholder="1" className="pl-10" />
                                     </div>
                                 </div>
@@ -92,7 +92,7 @@ const PostJob = () => {
                             <div className="space-y-2">
                                 <Label>Location</Label>
                                 <div className="relative">
-                                    <MapPin className="absolute left-3 top-3 text-slate-400" size={18} />
+                                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                                     <Input placeholder="Same as profile location" className="pl-10" />
                                 </div>
                             </div>

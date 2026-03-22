@@ -24,7 +24,7 @@ const FindJobs: React.FC = () => {
       <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft border border-white/60 p-4">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-4 top-3.5 text-slate-400" size={20} />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
             <input
               type="text"
               placeholder="Search job title or company..."
@@ -34,7 +34,7 @@ const FindJobs: React.FC = () => {
             />
           </div>
           <div className="flex-1 relative">
-            <MapPin className="absolute left-4 top-3.5 text-slate-400" size={20} />
+            <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
             <input
               type="text"
               placeholder="Location (e.g. Manhattan)"

@@ -84,7 +84,7 @@ const HotelProfile = () => {
                             <div className="space-y-2">
                                 <Label htmlFor="businessName">Business Name</Label>
                                 <div className="relative">
-                                    <Building2 className="absolute left-3 top-3 text-slate-400" size={18} />
+                                    <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                                     <Input id="businessName" placeholder="e.g. Taj Mahal Palace & Spa" className="pl-10" defaultValue="The Taj Mahal Palace" />
                                 </div>
                             </div>
@@ -93,14 +93,14 @@ const HotelProfile = () => {
                                 <div className="space-y-2">
                                     <Label htmlFor="email">Email Address</Label>
                                     <div className="relative">
-                                        <Mail className="absolute left-3 top-3 text-slate-400" size={18} />
+                                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                                         <Input id="email" type="email" placeholder="contact@hotel.com" className="pl-10" />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="phone">Contact Number</Label>
                                     <div className="relative">
-                                        <Phone className="absolute left-3 top-3 text-slate-400" size={18} />
+                                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                                         <Input id="phone" placeholder="+91 98765 43210" className="pl-10" />
                                     </div>
                                 </div>
@@ -109,7 +109,7 @@ const HotelProfile = () => {
                             <div className="space-y-2">
                                 <Label htmlFor="website">Website (Optional)</Label>
                                 <div className="relative">
-                                    <Globe className="absolute left-3 top-3 text-slate-400" size={18} />
+                                    <Globe className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                                     <Input id="website" placeholder="https://www.tajhotels.com" className="pl-10" />
                                 </div>
                             </div>
@@ -132,7 +132,7 @@ const HotelProfile = () => {
                             <div className="space-y-2">
                                 <Label htmlFor="location">Address / Location</Label>
                                 <div className="relative">
-                                    <MapPin className="absolute left-3 top-3 text-slate-400" size={18} />
+                                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                                     <Input id="location" placeholder="123, Main Street, City" className="pl-10" />
                                 </div>
                             </div>
@@ -140,7 +140,7 @@ const HotelProfile = () => {
                             <div className="space-y-2">
                                 <Label htmlFor="hours">Typical Working Hours</Label>
                                 <div className="relative">
-                                    <Clock className="absolute left-3 top-3 text-slate-400" size={18} />
+                                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                                     <Input id="hours" placeholder="e.g. 9:00 AM - 11:00 PM" className="pl-10" />
                                 </div>
                             </div>

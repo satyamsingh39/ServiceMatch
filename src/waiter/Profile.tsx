@@ -117,7 +117,7 @@ const Profile: React.FC = () => {
               ))}
             </div>
             <div className="relative">
-              <Plus className="absolute left-3.5 top-3.5 text-slate-400" size={18} />
+              <Plus className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
               <input
                 type="text"
                 value={newSkill}
