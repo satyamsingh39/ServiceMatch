@@ -18,12 +18,14 @@ export interface Job {
 export interface Application {
   id?: string;
   _id?: string;
-  jobId: any;
-  applicantId: any;
-  status: 'Applied' | 'Shortlisted' | 'Interview' | 'Rejected' | 'Hired';
-  appliedAt?: string;
-  date?: string;
-}
+    jobId: any;
+    applicantId: any;
+    status: 'Applied' | 'Shortlisted' | 'Interview' | 'Rejected' | 'Hired';
+    appliedAt?: string;
+    date?: string;
+    jobTitle?: string;
+    company?: string;
+  }
 
 export interface Notification {
   id: string;
