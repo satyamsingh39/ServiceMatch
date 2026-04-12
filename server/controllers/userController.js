@@ -246,14 +246,14 @@ import HotelProfile from "../models/HotelProfile.js";
 export const createOrUpdateProfile = asyncHandler(async (req, res) => {
   const uid = req.firebaseUid;
   const email = req.firebaseEmail;
-  const { 
-    name, 
-    role, 
-    phone, 
-    location, 
-    bio, 
-    experience, 
-    skills, 
+  const {
+    name,
+    role,
+    phone,
+    location,
+    bio,
+    experience,
+    skills,
     availability,
     businessName, // For Hotel
     website,
@@ -262,7 +262,9 @@ export const createOrUpdateProfile = asyncHandler(async (req, res) => {
     businessType
   } = req.body;
 
-  let user = await User.findOne({ firebaseUID: uid });
+  let user = await User.findOne({ 
+    $or: [{ firebaseUID: uid }, { uid: uid }] 
+  });
 
   if (user) {
     // Update basic user info
@@ -274,12 +276,12 @@ export const createOrUpdateProfile = asyncHandler(async (req, res) => {
     user.skills = skills || user.skills;
     user.availability = availability || user.availability;
     user.role = role || user.role;
-    
+
     // Simple profile completion logic
     let fields = [user.name, user.phone, user.location, user.bio, user.experience];
     let completed = fields.filter(f => !!f).length;
     user.profileCompleted = Math.round((completed / fields.length) * 100);
-    
+
     await user.save();
 
     // If employer, update HotelProfile
@@ -315,6 +317,7 @@ export const createOrUpdateProfile = asyncHandler(async (req, res) => {
 
   // New User
   user = await User.create({
+    uid: uid,
     firebaseUID: uid,
     email,
     name: name || email.split('@')[0],
@@ -322,11 +325,11 @@ export const createOrUpdateProfile = asyncHandler(async (req, res) => {
   });
 
   if (user.role === "employer") {
-      await HotelProfile.create({
-          ownerId: user._id,
-          businessName: businessName || user.name,
-          location: location || "TBD"
-      });
+    await HotelProfile.create({
+      ownerId: user._id,
+      businessName: businessName || user.name,
+      location: location || "TBD"
+    });
   }
 
   res.status(201).json({
@@ -344,7 +347,9 @@ export const createOrUpdateProfile = asyncHandler(async (req, res) => {
 export const getProfile = asyncHandler(async (req, res) => {
   const uid = req.firebaseUid;
 
-  const user = await User.findOne({ firebaseUID: uid }).select("-__v");
+  const user = await User.findOne({ 
+    $or: [{ firebaseUID: uid }, { uid: uid }] 
+  }).select("-__v");
 
   if (!user) {
     return res.status(404).json({ message: "User not found" });
@@ -352,7 +357,7 @@ export const getProfile = asyncHandler(async (req, res) => {
 
   let hotelDetails = null;
   if (user.role === "employer") {
-      hotelDetails = await HotelProfile.findOne({ ownerId: user._id });
+    hotelDetails = await HotelProfile.findOne({ ownerId: user._id });
   }
 
   res.json({

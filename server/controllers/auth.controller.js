@@ -11,8 +11,10 @@ export const syncUser = async (req, res) => {
         const { firebaseUid, firebaseEmail } = req;
         const { name, role, phone } = req.body;
 
-        // Check if user exists
-        let user = await User.findOne({ firebaseUID: firebaseUid });
+        // Check if user exists (checking both fields for compatibility)
+        let user = await User.findOne({ 
+            $or: [{ firebaseUID: firebaseUid }, { uid: firebaseUid }] 
+        });
 
         if (user) {
             // Update existing user if name/phone changed (optional sync)
@@ -30,6 +32,7 @@ export const syncUser = async (req, res) => {
         const userRole = validRoles.includes(role) ? role : "jobseeker";
 
         user = await User.create({
+            uid: firebaseUid,
             firebaseUID: firebaseUid,
             email: firebaseEmail,
             name: name || "New User",
