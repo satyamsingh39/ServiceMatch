@@ -10,6 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import api from '@/lib/api';
 import { useNavigate } from 'react-router-dom';
+import { indianCities } from '@/constants/indianCities';
 
 const PostJob = () => {
     const { toast } = useToast();
@@ -26,6 +27,24 @@ const PostJob = () => {
         location: '',
         requirements: ''
     });
+
+    const frequentRequirements = [
+        "Communication", "Teamwork", "Punctuality", 
+        "English", "Multitasking", "Customer Service",
+        "Honesty", "Food Hygiene"
+    ];
+
+    const addRequirement = (req) => {
+        setFormData(prev => {
+            const currentReqs = prev.requirements.split(',').map(r => r.trim()).filter(r => r !== "");
+            if (currentReqs.includes(req)) return prev;
+            
+            const newValue = prev.requirements.trim() 
+                ? `${prev.requirements.trim()}, ${req}` 
+                : req;
+            return { ...prev, requirements: newValue };
+        });
+    };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -194,6 +213,18 @@ const PostJob = () => {
                                     onChange={handleInputChange}
                                     placeholder="e.g. Communication, Teamwork, Multitasking" 
                                 />
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                    {frequentRequirements.map((req) => (
+                                        <button
+                                            key={req}
+                                            type="button"
+                                            onClick={() => addRequirement(req)}
+                                            className="px-3 py-1 text-xs font-medium rounded-full bg-slate-100 text-slate-600 hover:bg-primary hover:text-white transition-colors border border-slate-200"
+                                        >
+                                            + {req}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
 
                             <div className="space-y-2">
@@ -206,8 +237,14 @@ const PostJob = () => {
                                         onChange={handleInputChange}
                                         placeholder="e.g. Mumbai, Maharashtra" 
                                         className="pl-10" 
+                                        list="location-suggestions"
                                         required
                                     />
+                                    <datalist id="location-suggestions">
+                                        {indianCities.map(loc => (
+                                            <option key={loc} value={loc} />
+                                        ))}
+                                    </datalist>
                                 </div>
                             </div>
                         </CardContent>
