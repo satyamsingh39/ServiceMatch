@@ -12,6 +12,7 @@ import api from '@/lib/api';
 import { auth } from '@/lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
+import { indianCities } from '@/constants/indianCities';
 
 // Animation for business profile
 const businessAnimation = "https://lottie.host/362f3e8b-2c40-4f51-8b1b-9f9316d9a0d8/YtXv0G7n9V.json";
@@ -291,14 +292,20 @@ const HotelProfile = () => {
                                 <div className="space-y-3">
                                     <Label htmlFor="location" className="font-bold text-slate-700">Business Address</Label>
                                     <div className="group relative">
-                                        <MapPin className="absolute left-4 top-4 text-slate-300 group-focus-within:text-primary transition-colors" size={20} />
-                                        <Textarea
+                                        <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors" size={20} />
+                                        <Input
                                             id="location" 
-                                            placeholder="Street, City, State, Zip..." 
-                                            className="pl-12 min-h-[100px] rounded-2xl border-slate-100 bg-white group-hover:border-primary/20 focus:border-primary/40 focus:ring-4 focus:ring-primary/5 transition-all font-medium resize-none" 
+                                            placeholder="Street, City, State..." 
+                                            className="pl-12 h-14 rounded-2xl border-slate-100 bg-white group-hover:border-primary/20 focus:border-primary/40 focus:ring-4 focus:ring-primary/5 transition-all font-medium" 
                                             value={data.hotel.location || ""}
                                             onChange={(e) => setData({...data, hotel: {...data.hotel, location: e.target.value}})}
+                                            list="location-suggestions"
                                         />
+                                        <datalist id="location-suggestions">
+                                            {indianCities.map(loc => (
+                                                <option key={loc} value={loc} />
+                                            ))}
+                                        </datalist>
                                     </div>
                                 </div>
 

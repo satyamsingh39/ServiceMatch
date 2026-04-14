@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Camera, Mail, Phone, MapPin, Plus, X, FileCheck, Loader2 } from 'lucide-react';
 import api from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
+import { indianCities } from '@/constants/indianCities';
 
 const Profile: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -184,7 +185,13 @@ const Profile: React.FC = () => {
                     className="w-full bg-slate-50 border border-slate-100 rounded-xl p-3 text-sm outline-none"
                     value={profile.location || ""}
                     onChange={(e) => setProfile({...profile, location: e.target.value})}
+                    list="location-suggestions"
                   />
+                  <datalist id="location-suggestions">
+                    {indianCities.map(loc => (
+                      <option key={loc} value={loc} />
+                    ))}
+                  </datalist>
                </div>
             </div>
           </div>

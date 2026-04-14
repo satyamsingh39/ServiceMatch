@@ -3,6 +3,7 @@ import { Search, MapPin, Filter, SlidersHorizontal, Loader2 } from 'lucide-react
 import JobCard from '../components/JobCard';
 import api from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
+import { indianCities } from '@/constants/indianCities';
 
 const FindJobs: React.FC = () => {
   const [jobs, setJobs] = useState([]);
@@ -85,7 +86,13 @@ const FindJobs: React.FC = () => {
               className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-100 focus:bg-white focus:border-primary/50 focus:ring-4 focus:ring-primary/10 rounded-xl outline-none transition-all placeholder:text-slate-400 text-slate-800"
               value={locationFilter}
               onChange={(e) => setLocationFilter(e.target.value)}
+              list="location-suggestions"
             />
+            <datalist id="location-suggestions">
+              {indianCities.map(loc => (
+                <option key={loc} value={loc} />
+              ))}
+            </datalist>
           </div>
           <button className="bg-slate-900 hover:bg-black text-white px-6 py-3 rounded-xl font-medium transition-all shadow-lg shadow-slate-900/20 flex items-center justify-center gap-2">
             <Search size={18} /> Search
