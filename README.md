@@ -72,18 +72,18 @@ The diagram below maps the clean, decoupled flow of data across the ServiceMatch
 
 ```mermaid
 graph TD
-    A[React Client Web App] -->|HTTPS REST API| B[Express API Gateway]
-    A -->|Static Assets & Images| C[Firebase Cloud Storage]
-    B -->|Mongoose queries| D[(MongoDB Database)]
-    B -->|Admin JWT Verification| E[Firebase Admin SDK]
-    B -->|Intelligent Prompts| F[Google Gemini AI Engine]
+    A["React Client Web App"] -->|HTTPS REST API| B["Express API Gateway"]
+    A -->|Static Assets & Images| C["Firebase Cloud Storage"]
+    B -->|Mongoose queries| D[("MongoDB Database")]
+    B -->|Admin JWT Verification| E["Firebase Admin SDK"]
+    B -->|Intelligent Prompts| F["Google Gemini AI Engine"]
     
-    subgraph Frontend (Port: 5173 / Bun)
-    A
+    subgraph Frontend ["Frontend - Port 5173 - Bun"]
+        A
     end
     
-    subgraph Backend (Port: 5000 / Node)
-    B
+    subgraph Backend ["Backend - Port 5000 - Node"]
+        B
     end
 ```
 
