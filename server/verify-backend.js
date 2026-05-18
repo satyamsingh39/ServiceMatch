@@ -1,36 +1,72 @@
 // server/verify-backend.js
-// Run with: node verify-backend.js
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import User from "./models/userModel.js";
+import Job from "./models/Job.js";
+import Application from "./models/Application.js";
 
-const BASE_URL = "http://localhost:5000";
+dotenv.config();
 
-async function testEndpoints() {
-    console.log("🔍 Verifying Backend Endpoints...");
+const verify = async () => {
+  try {
+    console.log("🚀 Starting Backend Verification...");
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("✅ Connected to MongoDB");
 
-    try {
-        // 1. Health Check
-        const health = await fetch(`${BASE_URL}/`);
-        const healthText = await health.text();
-        console.log(`[GET /] Status: ${health.status} (${healthText.includes("ServiceMatch API is live") ? "PASS" : "FAIL"})`);
-
-        // 2. Auth Routes (Should pass 401 Unauthorized without token)
-        const authSync = await fetch(`${BASE_URL}/api/auth/sync`, { method: "POST" });
-        const authSyncJson = await authSync.json();
-        console.log(`[POST /api/auth/sync] Status: ${authSync.status} (${authSync.status === 401 ? "PASS (Protected)" : "FAIL"})`);
-
-        // 3. Waiter Routes
-        const waiterDashboard = await fetch(`${BASE_URL}/api/waiter/dashboard`);
-        console.log(`[GET /api/waiter/dashboard] Status: ${waiterDashboard.status} (${waiterDashboard.status === 401 ? "PASS (Protected)" : "FAIL"})`);
-
-        // 4. Hotel Routes
-        const hotelDashboard = await fetch(`${BASE_URL}/api/hotel/dashboard`);
-        console.log(`[GET /api/hotel/dashboard] Status: ${hotelDashboard.status} (${hotelDashboard.status === 401 ? "PASS (Protected)" : "FAIL"})`);
-
-        console.log("\n✅ Verification Complete: All protected routes are correctly rejecting unauthenticated requests.");
-
-    } catch (error) {
-        console.error("❌ Verification Failed:", error.message);
-        console.log("⚠️ Make sure the server is running on port 5000.");
+    // 1. Create/Find Test Employer
+    let employer = await User.findOne({ email: "employer@test.com" });
+    if (!employer) {
+      employer = await User.create({
+        firebaseUID: "test_employer_uid_123",
+        name: "Test Employer",
+        email: "employer@test.com",
+        role: "employer",
+      });
+      console.log("✅ Created Test Employer");
     }
-}
 
-testEndpoints();
+    // 2. Create/Find Test Job Seeker
+    let jobseeker = await User.findOne({ email: "jobseeker@test.com" });
+    if (!jobseeker) {
+      jobseeker = await User.create({
+        firebaseUID: "test_jobseeker_uid_123",
+        name: "Test JobSeeker",
+        email: "jobseeker@test.com",
+        role: "jobseeker",
+      });
+      console.log("✅ Created Test JobSeeker");
+    }
+
+    // 3. Post a Job
+    const job = await Job.create({
+      employerId: employer._id,
+      title: "Test Waiter Job",
+      description: "Looking for a test waiter.",
+      location: "Test Location",
+      jobType: "Full-time",
+      requirements: ["Test Skill 1", "Test Skill 2"],
+    });
+    console.log("✅ Successfully Posted a Job:", job.title);
+
+    // 4. Apply to Job
+    const app = await Application.create({
+      jobId: job._id,
+      applicantId: jobseeker._id,
+    });
+    console.log("✅ Successfully Applied to Job. Status:", app.status);
+
+    // 5. Cleanup (optional - I'll keep them for the user to see in DB)
+    // await Job.findByIdAndDelete(job._id);
+    // await Application.findByIdAndDelete(app._id);
+    
+    console.log("\n🎉 Verification Successful! All models and relationships are working correctly.");
+
+  } catch (error) {
+    console.error("❌ Verification Failed:", error.message);
+  } finally {
+    await mongoose.disconnect();
+    console.log("🔌 Disconnected from MongoDB");
+  }
+};
+
+verify();

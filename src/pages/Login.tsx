@@ -560,9 +560,9 @@ const Login = () => {
       });
 
       // 6️⃣ Redirect based on role
-      if (role === "chef-waiter") {
+      if (role === "jobseeker" || role === "chef-waiter") {
         navigate("/waiter/dashboard");
-      } else if (role === "hotel-restaurant") {
+      } else if (role === "employer" || role === "hotel-restaurant") {
         navigate("/hotel/dashboard");
       } else {
         // Fallback

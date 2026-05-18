@@ -1,15 +1,55 @@
-import React, { useState } from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import { LayoutDashboard, User, Briefcase, FileCheck, Bell, LogOut, Menu, X, ChefHat } from 'lucide-react';
-import { MOCK_USER } from '../services/mockData';
-// import GeminiCoach from './GeminiCoach';
+import React, { useState, useEffect } from 'react';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, User, Briefcase, FileCheck, Bell, LogOut, Menu, X, ChefHat, Loader2 } from 'lucide-react';
+import api from '@/lib/api';
 
 const Layout: React.FC = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [profile, setProfile] = useState<any>(() => {
+    // Initial fallback to localStorage if available
+    const savedUser = localStorage.getItem("user");
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
+  const [loading, setLoading] = useState(!profile);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const getDisplayName = () => {
+    if (loading && !profile) return 'Loading...';
+    if (profile?.name) return profile.name;
+    if (profile?.firstName && profile?.lastName) return `${profile.firstName} ${profile.lastName}`;
+    if (profile?.firstName) return profile.firstName;
+    return 'User';
+  };
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await api.get('/users/profile');
+        if (res.data?.success) {
+          const userData = res.data.data?.user || res.data.data || res.data.user;
+          if (userData) {
+            setProfile(userData);
+            localStorage.setItem("user", JSON.stringify(userData));
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/");
+  };
 
   const navItems = [
-    { path: '/', label: 'Dashboard', icon: LayoutDashboard },
+    { path: '/waiter', label: 'Dashboard', icon: LayoutDashboard, exact: true },
     { path: '/waiter/jobs', label: 'Find Jobs', icon: Briefcase },
     { path: '/waiter/applications', label: 'Applied Jobs', icon: FileCheck },
     { path: '/waiter/notifications', label: 'Notifications', icon: Bell },
@@ -55,6 +95,7 @@ const Layout: React.FC = () => {
             <NavLink
               key={item.path}
               to={item.path}
+              end={item.exact}
               onClick={() => setSidebarOpen(false)}
               className={({ isActive }) => `
                 flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium
@@ -71,13 +112,22 @@ const Layout: React.FC = () => {
 
         <div className="p-4 border-t border-sky-50">
           <div className="flex items-center gap-3 px-4 py-3 mb-2 rounded-xl bg-gradient-to-br from-slate-50 to-sky-50 border border-sky-100">
-            <img src={MOCK_USER.avatar} alt="User" className="w-10 h-10 rounded-full border-2 border-white shadow-sm" />
+            <div className="w-10 h-10 rounded-full border-2 border-white shadow-sm bg-primary/10 flex items-center justify-center text-primary font-bold uppercase shrink-0">
+               {getDisplayName().charAt(0)}
+            </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold truncate text-slate-800">{MOCK_USER.name}</p>
-              <p className="text-xs text-slate-500 truncate">{MOCK_USER.role}</p>
+              <p className="text-sm font-bold truncate text-slate-800">
+                {getDisplayName()}
+              </p>
+              <p className="text-xs text-slate-500 truncate capitalize">
+                {profile?.role || 'Jobseeker'}
+              </p>
             </div>
           </div>
-          <button className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 hover:bg-rose-50 rounded-xl transition-colors font-medium">
+          <button 
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 hover:bg-rose-50 rounded-xl transition-colors font-medium"
+          >
             <LogOut size={20} />
             Logout
           </button>
@@ -96,7 +146,10 @@ const Layout: React.FC = () => {
           </div>
           
           <div className="flex items-center gap-4">
-            <button className="relative p-2 text-slate-500 hover:bg-white hover:shadow-sm rounded-full transition-all">
+            <button 
+              onClick={() => navigate('/waiter/notifications')}
+              className="relative p-2 text-slate-500 hover:bg-white hover:shadow-sm rounded-full transition-all"
+            >
               <Bell size={20} />
               <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white"></span>
             </button>

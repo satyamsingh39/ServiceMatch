@@ -1,43 +1,43 @@
+// server/controllers/auth.controller.js
 import User from "../models/userModel.js";
 
 /**
- * @desc    Create or update user profile (Sync Firebase Auth with MongoDB)
+ * @desc    Sync Firebase User with MongoDB
  * @route   POST /api/auth/sync
- * @access  Private (Token Only)
+ * @access  Private (Firebase Token Only)
  */
 export const syncUser = async (req, res) => {
     try {
         const { firebaseUid, firebaseEmail } = req;
-        const { name, role } = req.body;
+        const { name, role, phone } = req.body;
 
-        // Check if user exists
-        let user = await User.findOne({ uid: firebaseUid });
+        // Check if user exists (checking both fields for compatibility)
+        let user = await User.findOne({ 
+            $or: [{ firebaseUID: firebaseUid }, { uid: firebaseUid }] 
+        });
 
         if (user) {
-            // Update existing if needed (optional)
+            // Update existing user if name/phone changed (optional sync)
+            if (name || phone) {
+                user.name = name || user.name;
+                user.phone = phone || user.phone;
+                await user.save();
+            }
             return res.status(200).json({ success: true, data: user });
         }
 
         // Create new user
-        // Role validation
-        const validRoles = ["chef-waiter", "hotel-restaurant"];
-        const userRole = validRoles.includes(role) ? role : "chef-waiter"; // Default to waiter
-
-        // Split name if provided
-        let firstName = "New";
-        let lastName = "User";
-        if (name) {
-            const parts = name.split(" ");
-            firstName = parts[0];
-            lastName = parts.length > 1 ? parts.slice(1).join(" ") : "";
-        }
+        // Validate role: ensure it's either jobseeker or employer
+        const validRoles = ["jobseeker", "employer"];
+        const userRole = validRoles.includes(role) ? role : "jobseeker";
 
         user = await User.create({
             uid: firebaseUid,
+            firebaseUID: firebaseUid,
             email: firebaseEmail,
-            firstName,
-            lastName,
+            name: name || "New User",
             role: userRole,
+            phone: phone || "",
         });
 
         res.status(201).json({ success: true, data: user });
@@ -48,9 +48,9 @@ export const syncUser = async (req, res) => {
 };
 
 /**
- * @desc    Get current user profile
+ * @desc    Get current user profile from MongoDB
  * @route   GET /api/auth/me
- * @access  Private (Full Auth)
+ * @access  Private
  */
 export const getMe = async (req, res) => {
     try {

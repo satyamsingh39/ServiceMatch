@@ -1,5 +1,5 @@
-import React from 'react';
-import { PlusCircle, Edit, Trash2, Eye, MoreHorizontal, PauseCircle } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { PlusCircle, Edit, Trash2, Eye, MoreHorizontal, PauseCircle, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,14 +11,61 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import api from '@/lib/api';
+import { useToast } from '@/hooks/use-toast';
+import { formatDistanceToNow } from 'date-fns';
 
 const ManageJobs = () => {
-    // Mock Data
-    const jobs = [
-        { id: 1, title: 'Senior Chef', type: 'Full Time', salary: '₹25k - ₹35k', applicants: 12, status: 'Active', posted: '2 days ago' },
-        { id: 2, title: 'Waiter / Server', type: 'Part Time', salary: '₹12k - ₹15k', applicants: 8, status: 'Active', posted: '5 days ago' },
-        { id: 3, title: 'Housekeeping Staff', type: 'Full Time', salary: '₹10k - ₹12k', applicants: 4, status: 'Closed', posted: '1 week ago' },
-    ];
+    const [jobs, setJobs] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const { toast } = useToast();
+
+    const fetchJobs = async () => {
+        try {
+            setLoading(true);
+            const res = await api.get('/jobs/my-jobs');
+            setJobs(res.data.data || []);
+        } catch (error) {
+            toast({
+                title: "Error fetching jobs",
+                description: error.response?.data?.message || error.message,
+                variant: "destructive"
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchJobs();
+    }, []);
+
+    const handleDelete = async (jobId) => {
+        if (!window.confirm("Are you sure you want to delete this job listing?")) return;
+
+        try {
+            await api.delete(`/jobs/${jobId}`);
+            toast({
+                title: "Job deleted",
+                description: "The job listing has been removed successfully.",
+            });
+            setJobs(jobs.filter(job => job._id !== jobId));
+        } catch (error) {
+            toast({
+                title: "Delete failed",
+                description: error.response?.data?.message || error.message,
+                variant: "destructive"
+            });
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="flex h-64 items-center justify-center">
+                <Loader2 className="animate-spin text-primary" size={40} />
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6">
@@ -41,36 +88,35 @@ const ManageJobs = () => {
                             <tr>
                                 <th className="p-4 font-semibold text-slate-600 text-sm">Job Title</th>
                                 <th className="p-4 font-semibold text-slate-600 text-sm">Type & Salary</th>
-                                <th className="p-4 font-semibold text-slate-600 text-sm">Applicants</th>
-                                <th className="p-4 font-semibold text-slate-600 text-sm">Status</th>
+                                <th className="p-4 font-semibold text-slate-600 text-sm text-center">Status</th>
                                 <th className="p-4 font-semibold text-slate-600 text-sm">Posted</th>
                                 <th className="p-4 font-semibold text-slate-600 text-sm text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
-                            {jobs.map((job) => (
-                                <tr key={job.id} className="hover:bg-slate-50/50 transition-colors">
+                            {jobs.length === 0 ? (
+                                <tr>
+                                    <td colSpan="5" className="p-8 text-center text-slate-500">
+                                        No jobs found. Post your first job!
+                                    </td>
+                                </tr>
+                            ) : jobs.map((job) => (
+                                <tr key={job._id} className="hover:bg-slate-50/50 transition-colors">
                                     <td className="p-4">
                                         <h3 className="font-bold text-slate-800">{job.title}</h3>
-                                        <span className="text-xs text-slate-400">ID: #{1000 + job.id}</span>
+                                        <span className="text-xs text-slate-400 uppercase">ID: {job._id.slice(-6)}</span>
                                     </td>
                                     <td className="p-4">
-                                        <div className="text-sm text-slate-600">{job.type}</div>
-                                        <div className="text-sm font-medium text-slate-800">{job.salary}</div>
+                                        <div className="text-sm text-slate-600">{job.jobType}</div>
+                                        <div className="text-sm font-medium text-slate-800">{job.salary || 'Not specified'}</div>
                                     </td>
-                                    <td className="p-4">
-                                        <div className="flex items-center gap-2">
-                                            <span className="font-bold text-primary bg-blue-50 px-2 py-0.5 rounded text-sm">{job.applicants}</span>
-                                            {job.applicants > 0 && <span className="text-xs text-slate-400">candidates</span>}
-                                        </div>
-                                    </td>
-                                    <td className="p-4">
-                                        <Badge variant={job.status === 'Active' ? 'default' : 'secondary'} className={job.status === 'Active' ? 'bg-emerald-500 hover:bg-emerald-600' : ''}>
+                                    <td className="p-4 text-center">
+                                        <Badge variant={job.status === 'Open' ? 'default' : 'secondary'} className={job.status === 'Open' ? 'bg-emerald-500 hover:bg-emerald-600' : ''}>
                                             {job.status}
                                         </Badge>
                                     </td>
                                     <td className="p-4 text-sm text-slate-500">
-                                        {job.posted}
+                                        {formatDistanceToNow(new Date(job.createdAt), { addSuffix: true })}
                                     </td>
                                     <td className="p-4 text-right">
                                         <DropdownMenu>
@@ -82,17 +128,19 @@ const ManageJobs = () => {
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                                 <DropdownMenuSeparator />
-                                                <DropdownMenuItem>
-                                                    <Eye className="mr-2 h-4 w-4" /> View Applicants
+                                                <DropdownMenuItem asChild>
+                                                    <Link to="/hotel/applicants" className="w-full">
+                                                        <Eye className="mr-2 h-4 w-4" /> View Applicants
+                                                    </Link>
                                                 </DropdownMenuItem>
-                                                <DropdownMenuItem>
+                                                <DropdownMenuItem disabled>
                                                     <Edit className="mr-2 h-4 w-4" /> Edit Job
                                                 </DropdownMenuItem>
-                                                <DropdownMenuItem>
-                                                    <PauseCircle className="mr-2 h-4 w-4" /> {job.status === 'Active' ? 'Close Job' : 'Reopen Job'}
-                                                </DropdownMenuItem>
                                                 <DropdownMenuSeparator />
-                                                <DropdownMenuItem className="text-rose-600 focus:text-rose-600">
+                                                <DropdownMenuItem 
+                                                    className="text-rose-600 focus:text-rose-600"
+                                                    onClick={() => handleDelete(job._id)}
+                                                >
                                                     <Trash2 className="mr-2 h-4 w-4" /> Delete
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>

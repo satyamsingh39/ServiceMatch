@@ -18,8 +18,10 @@ export const verifyFirebaseToken = async (req, res, next) => {
     const decoded = await admin.auth().verifyIdToken(token);
     req.firebaseUid = decoded.uid;
 
-    // Fetch user from MongoDB
-    const user = await User.findOne({ uid: decoded.uid });
+    // Fetch user from MongoDB (check both fields for compatibility)
+    const user = await User.findOne({ 
+      $or: [{ firebaseUID: decoded.uid }, { uid: decoded.uid }] 
+    });
 
     if (!user) {
       return res.status(401).json({ success: false, message: "User not found in database. Please complete profile." });

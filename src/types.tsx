@@ -1,23 +1,31 @@
 export interface Job {
-  id: string;
+  id?: string;
+  _id?: string;
   title: string;
-  company: string;
+  company?: string; // Optional if referencing employer
+  employerId?: { name: string; businessName?: string };
   location: string;
   salary: string;
-  type: 'Full-time' | 'Part-time' | 'Casual';
+  jobType: string;
+  type?: string; // For backward compatibility
   description: string;
-  postedAt: string;
-  matchScore?: number; // AI match score
+  requirements?: string[];
+  postedAt?: string;
+  createdAt?: string;
+  matchScore?: number;
 }
 
 export interface Application {
-  id: string;
-  jobId: string;
-  jobTitle: string;
-  company: string;
-  status: 'Applied' | 'Shortlisted' | 'Interview' | 'Rejected' | 'Hired';
-  date: string;
-}
+  id?: string;
+  _id?: string;
+    jobId: any;
+    applicantId: any;
+    status: 'Applied' | 'Shortlisted' | 'Interview' | 'Rejected' | 'Hired';
+    appliedAt?: string;
+    date?: string;
+    jobTitle?: string;
+    company?: string;
+  }
 
 export interface Notification {
   id: string;

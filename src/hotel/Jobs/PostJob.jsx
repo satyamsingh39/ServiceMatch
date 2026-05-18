@@ -1,5 +1,5 @@
-import React from 'react';
-import { Send, Sparkles, MapPin, DollarSign, Clock, Users, Briefcase } from 'lucide-react';
+import React, { useState } from 'react';
+import { Send, Sparkles, MapPin, IndianRupee, Clock, Users, Briefcase, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -7,10 +7,95 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
+import { useToast } from '@/hooks/use-toast';
+import api from '@/lib/api';
+import { useNavigate } from 'react-router-dom';
+import { indianCities } from '@/constants/indianCities';
 
 const PostJob = () => {
+    const { toast } = useToast();
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+    
+    const [formData, setFormData] = useState({
+        title: '',
+        salary: '',
+        openings: '1',
+        experience: '',
+        jobType: '',
+        description: '',
+        location: '',
+        requirements: ''
+    });
+
+    const frequentRequirements = [
+        "Communication", "Teamwork", "Punctuality", 
+        "English", "Multitasking", "Customer Service",
+        "Honesty", "Food Hygiene"
+    ];
+
+    const addRequirement = (req) => {
+        setFormData(prev => {
+            const currentReqs = prev.requirements.split(',').map(r => r.trim()).filter(r => r !== "");
+            if (currentReqs.includes(req)) return prev;
+            
+            const newValue = prev.requirements.trim() 
+                ? `${prev.requirements.trim()}, ${req}` 
+                : req;
+            return { ...prev, requirements: newValue };
+        });
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleSelectChange = (name, value) => {
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        
+        if (!formData.title || !formData.description || !formData.location || !formData.jobType) {
+            toast({
+                title: "Missing Fields",
+                description: "Please fill in all required fields.",
+                variant: "destructive"
+            });
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const payload = {
+                ...formData,
+                requirements: formData.requirements.split(',').map(r => r.trim()).filter(r => r !== ""),
+                status: 'Open'
+            };
+
+            await api.post('/jobs/', payload);
+            
+            toast({
+                title: "Job Posted! 🚀",
+                description: "Your job listing has been successfully created.",
+            });
+            
+            navigate('/hotel/manage-jobs');
+        } catch (error) {
+            toast({
+                title: "Failed to post job",
+                description: error.response?.data?.message || error.message,
+                variant: "destructive"
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
-        <div className="max-w-4xl mx-auto space-y-6 pb-12">
+        <form onSubmit={handleSubmit} className="max-w-4xl mx-auto space-y-6 pb-12">
             <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-slate-800 tracking-tight">Post a New Job</h1>
@@ -24,10 +109,17 @@ const PostJob = () => {
                     <Card className="border-slate-100 shadow-sm">
                         <CardContent className="p-6 space-y-6">
                             <div className="space-y-2">
-                                <Label className="text-base font-semibold">Job Title</Label>
+                                <Label className="text-base font-semibold">Job Title *</Label>
                                 <div className="relative">
-                                    <Briefcase className="absolute left-3 top-3 text-slate-400" size={18} />
-                                    <Input placeholder="e.g. Senior Chef, Waiter, Housekeeping Staff" className="pl-10 h-11" />
+                                    <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                    <Input 
+                                        name="title"
+                                        value={formData.title}
+                                        onChange={handleInputChange}
+                                        placeholder="e.g. Senior Chef, Waiter, Housekeeping Staff" 
+                                        className="pl-10 h-11" 
+                                        required
+                                    />
                                 </div>
                             </div>
 
@@ -35,15 +127,28 @@ const PostJob = () => {
                                 <div className="space-y-2">
                                     <Label>Salary Range / Month</Label>
                                     <div className="relative">
-                                        <DollarSign className="absolute left-3 top-3 text-slate-400" size={18} />
-                                        <Input placeholder="e.g. 15,000 - 25,000" className="pl-10" />
+                                        <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                        <Input 
+                                            name="salary"
+                                            value={formData.salary}
+                                            onChange={handleInputChange}
+                                            placeholder="e.g. 15,000 - 25,000" 
+                                            className="pl-10" 
+                                        />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Openings</Label>
                                     <div className="relative">
-                                        <Users className="absolute left-3 top-3 text-slate-400" size={18} />
-                                        <Input type="number" placeholder="1" className="pl-10" />
+                                        <Users className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                        <Input 
+                                            name="openings"
+                                            type="number" 
+                                            value={formData.openings}
+                                            onChange={handleInputChange}
+                                            placeholder="1" 
+                                            className="pl-10" 
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -51,7 +156,10 @@ const PostJob = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label>Experience Required</Label>
-                                    <Select>
+                                    <Select 
+                                        onValueChange={(v) => handleSelectChange('experience', v)}
+                                        value={formData.experience}
+                                    >
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select experience" />
                                         </SelectTrigger>
@@ -65,35 +173,78 @@ const PostJob = () => {
                                     </Select>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Shift Type</Label>
-                                    <Select>
+                                    <Label>Job Type *</Label>
+                                    <Select 
+                                        onValueChange={(v) => handleSelectChange('jobType', v)}
+                                        value={formData.jobType}
+                                        required
+                                    >
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select shift" />
+                                            <SelectValue placeholder="Select type" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="full-time">Full Time</SelectItem>
-                                            <SelectItem value="part-time">Part Time</SelectItem>
-                                            <SelectItem value="night-shift">Night Shift</SelectItem>
-                                            <SelectItem value="weekend">Weekend Only</SelectItem>
+                                            <SelectItem value="Full-time">Full Time</SelectItem>
+                                            <SelectItem value="Part-time">Part Time</SelectItem>
+                                            <SelectItem value="Contract">Contract</SelectItem>
+                                            <SelectItem value="Temporary">Temporary</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <Label>Job Description</Label>
+                                <Label>Job Description *</Label>
                                 <Textarea
+                                    name="description"
+                                    value={formData.description}
+                                    onChange={handleInputChange}
                                     placeholder="Describe the roles and responsibilities..."
-                                    className="min-h-[150px] resize-none"
+                                    className="min-h-[120px] resize-none"
+                                    required
                                 />
-                                <p className="text-xs text-slate-500 text-right">0/500 characters</p>
+                                <p className="text-xs text-slate-500 text-right">{formData.description.length}/500 characters</p>
                             </div>
 
                             <div className="space-y-2">
-                                <Label>Location</Label>
+                                <Label>Requirements (comma separated)</Label>
+                                <Input 
+                                    name="requirements"
+                                    value={formData.requirements}
+                                    onChange={handleInputChange}
+                                    placeholder="e.g. Communication, Teamwork, Multitasking" 
+                                />
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                    {frequentRequirements.map((req) => (
+                                        <button
+                                            key={req}
+                                            type="button"
+                                            onClick={() => addRequirement(req)}
+                                            className="px-3 py-1 text-xs font-medium rounded-full bg-slate-100 text-slate-600 hover:bg-primary hover:text-white transition-colors border border-slate-200"
+                                        >
+                                            + {req}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>Location *</Label>
                                 <div className="relative">
-                                    <MapPin className="absolute left-3 top-3 text-slate-400" size={18} />
-                                    <Input placeholder="Same as profile location" className="pl-10" />
+                                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                    <Input 
+                                        name="location"
+                                        value={formData.location}
+                                        onChange={handleInputChange}
+                                        placeholder="e.g. Mumbai, Maharashtra" 
+                                        className="pl-10" 
+                                        list="location-suggestions"
+                                        required
+                                    />
+                                    <datalist id="location-suggestions">
+                                        {indianCities.map(loc => (
+                                            <option key={loc} value={loc} />
+                                        ))}
+                                    </datalist>
                                 </div>
                             </div>
                         </CardContent>
@@ -132,12 +283,20 @@ const PostJob = () => {
                         </CardContent>
                     </Card>
 
-                    <Button className="w-full h-12 text-lg bg-slate-900 hover:bg-slate-800 shadow-xl transition-all">
-                        Post Job Now <Send className="ml-2" size={18} />
+                    <Button 
+                        type="submit"
+                        disabled={loading}
+                        className="w-full h-12 text-lg bg-slate-900 hover:bg-slate-800 shadow-xl transition-all"
+                    >
+                        {loading ? (
+                            <>Posting... <Loader2 className="ml-2 animate-spin" size={18} /></>
+                        ) : (
+                            <>Post Job Now <Send className="ml-2" size={18} /></>
+                        )}
                     </Button>
                 </div>
             </div>
-        </div>
+        </form>
     );
 };
 

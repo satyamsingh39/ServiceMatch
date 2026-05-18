@@ -236,6 +236,7 @@
 // server/controllers/userController.js
 import asyncHandler from "express-async-handler";
 import User from "../models/userModel.js";
+import HotelProfile from "../models/HotelProfile.js";
 
 /**
  * @desc    Create or update a user profile after Firebase authentication
@@ -243,42 +244,98 @@ import User from "../models/userModel.js";
  * @access  Private (requires Firebase ID token)
  */
 export const createOrUpdateProfile = asyncHandler(async (req, res) => {
-  const { uid, email } = req.firebaseUser; // Decoded from Firebase token
-  const { firstName, lastName, role } = req.body;
+  const uid = req.firebaseUid;
+  const email = req.firebaseEmail;
+  const {
+    name,
+    role,
+    phone,
+    location,
+    bio,
+    experience,
+    skills,
+    availability,
+    businessName, // For Hotel
+    website,
+    description,
+    workHours,
+    businessType
+  } = req.body;
 
-  if (!firstName || !lastName) {
-    return res.status(400).json({
-      message: "First name and last name are required",
-    });
-  }
-
-  let user = await User.findOne({ uid });
-
-  // ✅ If user exists, update their profile
-  if (user) {
-    user.firstName = firstName || user.firstName;
-    user.lastName = lastName || user.lastName;
-    user.role = role || user.role;
-    await user.save();
-
-    return res.json({
-      message: "Profile updated successfully",
-      user,
-    });
-  }
-
-  // 🆕 If new user, create profile
-  user = await User.create({
-    uid,
-    email,
-    firstName,
-    lastName,
-    role: role || "chef-waiter",
+  let user = await User.findOne({ 
+    $or: [{ firebaseUID: uid }, { uid: uid }] 
   });
 
+  if (user) {
+    // Update basic user info
+    user.name = name || user.name;
+    user.phone = phone || user.phone;
+    user.location = location || user.location;
+    user.bio = bio || user.bio;
+    user.experience = experience || user.experience;
+    user.skills = skills || user.skills;
+    user.availability = availability || user.availability;
+    user.role = role || user.role;
+
+    // Simple profile completion logic
+    let fields = [user.name, user.phone, user.location, user.bio, user.experience];
+    let completed = fields.filter(f => !!f).length;
+    user.profileCompleted = Math.round((completed / fields.length) * 100);
+
+    await user.save();
+
+    // If employer, update HotelProfile
+    if (user.role === "employer") {
+      let hotelProfile = await HotelProfile.findOne({ ownerId: user._id });
+      if (!hotelProfile) {
+        hotelProfile = await HotelProfile.create({
+          ownerId: user._id,
+          businessName: businessName || name,
+          location: location || "TBD",
+          description,
+          website,
+          workHours,
+          businessType
+        });
+      } else {
+        hotelProfile.businessName = businessName || hotelProfile.businessName;
+        hotelProfile.location = location || hotelProfile.location;
+        hotelProfile.description = description || hotelProfile.description;
+        hotelProfile.website = website || hotelProfile.website;
+        hotelProfile.workHours = workHours || hotelProfile.workHours;
+        hotelProfile.businessType = businessType || hotelProfile.businessType;
+        await hotelProfile.save();
+      }
+    }
+
+    return res.json({
+      success: true,
+      message: "Profile updated successfully",
+      data: { user, hotelDetails: user.role === "employer" ? await HotelProfile.findOne({ ownerId: user._id }) : null }
+    });
+  }
+
+  // New User
+  user = await User.create({
+    uid: uid,
+    firebaseUID: uid,
+    email,
+    name: name || email.split('@')[0],
+    role: role || "jobseeker",
+  });
+
+  if (user.role === "employer") {
+    await HotelProfile.create({
+      ownerId: user._id,
+      businessName: businessName || user.name,
+      location: location || "TBD"
+    });
+  }
+
   res.status(201).json({
+    success: true,
     message: "Profile created successfully",
-    user,
+    data: { user }
   });
 });
 
@@ -288,16 +345,27 @@ export const createOrUpdateProfile = asyncHandler(async (req, res) => {
  * @access  Private (requires Firebase ID token)
  */
 export const getProfile = asyncHandler(async (req, res) => {
-  const { uid } = req.firebaseUser;
+  const uid = req.firebaseUid;
 
-  const user = await User.findOne({ uid }).select("-__v");
+  const user = await User.findOne({ 
+    $or: [{ firebaseUID: uid }, { uid: uid }] 
+  }).select("-__v");
 
   if (!user) {
     return res.status(404).json({ message: "User not found" });
   }
 
+  let hotelDetails = null;
+  if (user.role === "employer") {
+    hotelDetails = await HotelProfile.findOne({ ownerId: user._id });
+  }
+
   res.json({
+    success: true,
     message: "Profile fetched successfully",
-    user,
+    data: {
+      user,
+      hotelDetails
+    }
   });
 });
