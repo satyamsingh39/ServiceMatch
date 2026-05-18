@@ -74,7 +74,7 @@ The diagram below maps the clean, decoupled flow of data across the ServiceMatch
 graph TD
     A["React Client Web App"] -->|HTTPS REST API| B["Express API Gateway"]
     A -->|Static Assets & Images| C["Firebase Cloud Storage"]
-    B -->|Mongoose queries| D[("MongoDB Database")]
+    B -->|Mongoose queries| D[(MongoDB Database)]
     B -->|Admin JWT Verification| E["Firebase Admin SDK"]
     B -->|Intelligent Prompts| F["Google Gemini AI Engine"]
     
