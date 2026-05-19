@@ -1,6 +1,6 @@
 import React from 'react';
 import { Job } from '../types';
-import { MapPin, DollarSign, Clock, Sparkles } from 'lucide-react';
+import { MapPin, IndianRupee, Clock, Sparkles } from 'lucide-react';
 
 interface JobCardProps {
   job: Job;
@@ -31,7 +31,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, compact = false, onApply }) => {
           <MapPin size={14} className="text-primary" /> {job.location}
         </span>
         <span className="flex items-center gap-1 bg-emerald-50/50 border border-emerald-100 px-2.5 py-1 rounded-lg text-emerald-700">
-          <DollarSign size={14} /> {job.salary}
+          <IndianRupee size={14} /> {job.salary}
         </span>
         {!compact && (
           <span className="flex items-center gap-1 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100">
