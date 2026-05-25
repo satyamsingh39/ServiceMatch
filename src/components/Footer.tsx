@@ -1,10 +1,26 @@
 import { Facebook, Instagram, Linkedin, Mail } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   const footerLinks = {
     Company: ['About Us', 'Careers', 'Press', 'Blog'],
     Support: ['Help Center', 'Safety', 'Contact Us', 'Terms of Service'],
     Resources: ['For Employers', 'For Job Seekers', 'Success Stories', 'FAQ'],
+  };
+
+  const linkRoutes: Record<string, string> = {
+    'About Us': '/about',
+    'Careers': '/careers',
+    'Press': '/press',
+    'Blog': '/blog',
+    'Help Center': '/help-center',
+    'Safety': '/safety',
+    'Contact Us': '/contact',
+    'Terms of Service': '/terms',
+    'For Employers': '/for-employers',
+    'For Job Seekers': '/for-job-seekers',
+    'Success Stories': '/success-stories',
+    'FAQ': '/faq',
   };
 
   const socialLinks = [
@@ -48,12 +64,12 @@ const Footer = () => {
               <ul className="space-y-2">
                 {links.map((link) => (
                   <li key={link}>
-                    <a
-                      href="#"
+                    <Link
+                      to={linkRoutes[link] || '#'}
                       className="text-sm text-muted-foreground hover:text-primary transition-colors"
                     >
                       {link}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>

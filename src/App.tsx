@@ -21,6 +21,18 @@ import CookiePolicy from "./pages/CookiePolicy";
 import Accessibility from "./pages/Accessibility";
 import NotFound from "./pages/NotFound";
 
+import About from "./pages/About";
+import Careers from "./pages/Careers";
+import Press from "./pages/Press";
+import Blog from "./pages/Blog";
+import HelpCenter from "./pages/HelpCenter";
+import Safety from "./pages/Safety";
+import Terms from "./pages/Terms";
+import ForEmployers from "./pages/ForEmployers";
+import ForJobSeekers from "./pages/ForJobSeekers";
+import SuccessStories from "./pages/SuccessStories";
+import FAQ from "./pages/FAQ";
+
 // ===== Waiter pages =====
 import Dashboard from "./waiter/Dashboard";
 import FindJobs from "./waiter/FindJobs";
@@ -61,6 +73,17 @@ const App = () => (
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/cookie-policy" element={<CookiePolicy />} />
           <Route path="/accessibility" element={<Accessibility />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/careers" element={<Careers />} />
+          <Route path="/press" element={<Press />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/help-center" element={<HelpCenter />} />
+          <Route path="/safety" element={<Safety />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/for-employers" element={<ForEmployers />} />
+          <Route path="/for-job-seekers" element={<ForJobSeekers />} />
+          <Route path="/success-stories" element={<SuccessStories />} />
+          <Route path="/faq" element={<FAQ />} />
 
 
           {/* ===== WAITER DASHBOARD ROUTES ===== */}
